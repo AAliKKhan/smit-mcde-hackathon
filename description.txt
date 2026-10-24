@@ -1,0 +1,11 @@
+The scenario
+
+Your team has two days to turn six months of messy HR exports into a trusted data warehouse, then tell the CFO why overtime cost keeps rising.
+
+The client.
+
+Indus Weave Textiles (fictional) is a textile manufacturer with about 1,200 employees across a head office and three plants. It recently moved HR onto a cloud HCM platform modeled on Polarapt HCM. Attendance, shifts, leave, overtime, payroll and recruitment each live in a separate module, and each exports its own files.
+
+The problem.
+
+The overtime bill has climbed for six months. HR says attendance looks normal. Payroll pays overtime from approved OT requests, not from actual biometric punches. Nobody trusts anyone's numbers, because every module tells a slightly different story.
