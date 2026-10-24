@@ -75,45 +75,47 @@ def build_roster() -> tuple[pd.DataFrame, dict]:
 
 
 def main() -> dict:
-    # ---- departments ---------------------------------------------------------
+    # ---- prepare every frame first ------------------------------------------
+    roster, rstats = build_roster()
+
     dep = db.read_sql(
         "SELECT dept_id, dept_name, plant, cost_center, previous_name, "
         "renamed_on FROM raw.departments"
     )
     for col in ("previous_name", "renamed_on"):
         dep[col] = dep[col].map(lambda v: str(v).strip() or None)
-    n_dep = replace_rows(dep, "staging.departments")
 
-    # ---- shifts --------------------------------------------------------------
     shifts = db.read_sql(
         "SELECT shift_code, name, start_time, end_time, crosses_midnight, "
         "grace_minutes, applies_to FROM raw.shifts"
     )
     shifts["crosses_midnight"] = shifts["crosses_midnight"].map(_to_bool01)
     shifts["grace_minutes"] = shifts["grace_minutes"].map(to_int)
-    n_shifts = replace_rows(shifts, "staging.shifts")
 
-    # ---- device mapping ------------------------------------------------------
     dev = db.read_sql(
         "SELECT device_id, device_user_id, emp_id, enrolled_on FROM raw.device_mapping"
     )
-    n_dev = replace_rows(dev, "staging.device_mapping")
 
-    # ---- holidays ------------------------------------------------------------
     hol = db.read_sql(
         "SELECT holiday_date, scope, holiday_name FROM raw.holidays"
     )
     hol["holiday_date"], bad = iso_series(hol["holiday_date"])
     assert bad == 0, "unparseable holiday_date"
-    n_hol = replace_rows(hol, "staging.holidays")
 
-    # ---- roster with gap-fill (Rules 5, 6) -----------------------------------
-    roster, rstats = build_roster()
+    # ---- FK-safe write order: staging.shift_roster REFERENCES shifts, so the
+    # child rows must be cleared before shifts can be rebuilt, and only then
+    # re-inserted (SQLite enforces FKs on both DELETE and INSERT).
+    db.execute("DELETE FROM staging.shift_roster")
+    n_shifts = replace_rows(shifts, "staging.shifts")
     n_ros = replace_rows(roster, "staging.shift_roster")
 
+    n_dep = replace_rows(dep, "staging.departments")
+    n_dev = replace_rows(dev, "staging.device_mapping")
+    n_hol = replace_rows(hol, "staging.holidays")
+
     stats = {
-        "departments": n_dep, "shifts": n_shifts, "device_mapping": n_dev,
-        "holidays": n_hol, "roster_rows": n_ros, **rstats,
+        "roster_rows": n_ros, "departments": n_dep, "shifts": n_shifts,
+        "device_mapping": n_dev, "holidays": n_hol, **rstats,
     }
     print_counts("03_clean_reference", stats)
     return stats

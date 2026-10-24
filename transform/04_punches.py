@@ -14,9 +14,12 @@ Processing order is fixed by research R3 - each step's output feeds the next:
                             previous KEPT punch. Collapsed rows are kept in
                             rejected_punches (reason=duplicate_within_2min) so
                             raw = staging + rejected stays exact.
-4. **attribute** (Rule 7) : NIGHT shift punches are shifted back 6 h before
-                            taking the date, so early-morning 1 Oct check-outs
-                            land on 30 Sep.
+4. **attribute** (Rule 7) : NIGHT punches with clock time < 12:00 step back one
+                            day (they close the shift that started the previous
+                            22:00), so early-morning 1 Oct check-outs land on
+                            30 Sep. A plain −6h only covers [00:00, 06:00) and
+                            strands the 06:00+ check-out stragglers on the same
+                            date (see ADR-002).
 """
 
 from __future__ import annotations
@@ -192,9 +195,17 @@ def main() -> dict:
     dropped = mapped[~mapped["_keep"]].copy()
 
     # ---- part D: night-shift attribution (Rule 7) ---------------------------
+    # NIGHT runs 22:00 -> 06:00: a punch before noon belongs to the shift that
+    # started the PREVIOUS evening, so date(punch) must step back one day.
+    # R5's fixed -6h only covers punches in [00:00, 06:00); the data's 06:00-06:30
+    # check-out stragglers land at 00:00-00:30 the same day under -6h, which
+    # mis-pairs them with the NEXT shift's check-in (15h "worked" spans).
+    # Pre-noon -> previous day reproduces -6h for [00:00,06:00) and fixes the
+    # stragglers: 1-Oct 06:10 check-outs still attribute to 30-Sep (contract).
     kept = _attach_shift(kept, roster, shifts)
     night = kept["shift_code"] == "NIGHT"
-    eff = kept["punch_ts"].where(~night, kept["punch_ts"] - pd.Timedelta(hours=6))
+    morning = night & (kept["punch_ts"].dt.hour < 12)
+    eff = kept["punch_ts"].where(~morning, kept["punch_ts"] - pd.Timedelta(days=1))
     kept["shift_date"] = eff.dt.strftime("%Y-%m-%d")
 
     # ---- write staging -------------------------------------------------------

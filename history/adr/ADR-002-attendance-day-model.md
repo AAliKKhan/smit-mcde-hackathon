@@ -16,10 +16,14 @@ fixed four-step order:
 1. **Day spine**: one row per employee per day from `hire_date` (clamped to 2026-04-01) through
    `min(separation_date, 2026-09-30)` — absentees exist because the spine exists, not because
    punches were missing (Rule 4).
-2. **Night attribution before pairing**: for NIGHT-shift days, effective punch datetime
-   `punch_time − 6h`, then `work_date = date(effective_time)`; first/last punch pair per
-   `(emp_id, work_date)` (Rules 7, 10). This automatically assigns 01-Oct 06:10 check-outs to
-   30-Sep shifts.
+2. **Night attribution before pairing**: for NIGHT-shift days, a punch whose clock time is
+   before 12:00 belongs to the shift that started the PREVIOUS evening (22:00), so its date
+   steps back one day; all other punches keep their own date (Rules 7, 10). First/last punch
+   pair per `(emp_id, work_date)` after attribution. This is R5's −6h intent made exact: a
+   fixed −6h covers only [00:00, 06:00), while 06:10 − 6h = 00:10 the same day would strand
+   the data's 06:00–06:30 check-out stragglers on the wrong date (and mis-pair them with the
+   next shift's check-in, producing ~15 h "worked" spans). With the pre-noon rule, 01-Oct
+   06:10 check-outs attribute to 30-Sep shifts as the data contract requires.
 3. **Status as a single CASE chain in exact Rule-12 priority**: `Weekly Off` > `Holiday` >
    `On Leave` > `Present` (≥2 punches) > `Missing Punch` (1) > `Absent` (0) — evaluated top-down
    so the first match wins; no status can be double-assigned.
@@ -45,8 +49,9 @@ Sundays/holidays (Rule 17) so `On Leave` never shadows `Weekly Off`/`Holiday`.
 
 ### Negative
 
-- −6h shift is a heuristic tied to NIGHT's fixed 22:00–06:00 window; if a rule amendment
-  changes night hours, step 2 must change (guarded by drift/night regression fixtures).
+- Pre-noon cutoff is a heuristic tied to NIGHT's fixed 22:00–06:00 window (morning punches
+  before noon = previous shift's check-out); if a rule amendment changes night hours, step 2
+  must change (guarded by drift/night regression fixtures).
 - Day spine expands rows to employee-days (~1,300 × 183 ≈ 240k) — negligible for SQLite but
   means absence is *materialized*, costing rebuild time.
 

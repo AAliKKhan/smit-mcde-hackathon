@@ -46,11 +46,12 @@ dedupe on uncorrected times would merge wrong pairs across the drift boundary.
 
 ## R5. Night-shift date attribution ✅ DECIDED — Rules 7, 10
 
-- Build `shift_date`: for NIGHT, punch datetime − 6h (or simply: if time < shift start of that
-  calendar day, attribute to previous day) then take the date. Case-study hint: "shift each punch
-  back by a few hours before taking its date."
-- Concrete: `eff_time = punch_time - INTERVAL 6 hours` for NIGHT rows, `shift_date =
-  date(eff_time)`; pairing (first/last) runs per `(emp_id, shift_date)` after attribution.
+- Build `shift_date`: for NIGHT, if clock time < 12:00 attribute to the previous calendar
+  day (the shift started the previous 22:00), else keep the same date. This is the R5 −6h
+  intent exact: −6h alone covers only [00:00, 06:00) — 06:10 − 6h = 00:10 the same day —
+  so the 06:00–06:30 check-out stragglers in the data need the full previous-day step
+  (implemented in `transform/04_punches.py` part D). Pairing (first/last) runs per
+  `(emp_id, shift_date)` after attribution.
 - Spillover verified: 1 Oct early check-outs must land on 30 Sep (data contract note in
   `biometric_punches.contract.md`).
 

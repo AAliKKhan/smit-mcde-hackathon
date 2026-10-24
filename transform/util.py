@@ -95,7 +95,7 @@ def to_int(value) -> int | None:
     return int(float(s))
 
 
-def _bindable(df: pd.DataFrame) -> list[tuple]:
+def bindable(df: pd.DataFrame) -> list[tuple]:
     """DataFrame rows as Python scalars sqlite3 can bind (numpy types rejected)."""
     obj = df.astype(object).where(pd.notna(df), None)
     rows = []
@@ -109,7 +109,7 @@ def replace_rows(df: pd.DataFrame, qualified: str) -> int:
     cols = list(df.columns)
     col_sql = ", ".join(cols)
     ph = ", ".join("?" for _ in cols)
-    rows = _bindable(df)
+    rows = bindable(df)
     c = db.conn()
     try:
         c.execute(f"DELETE FROM {qualified}")
