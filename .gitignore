@@ -1,0 +1,16 @@
+# generated database (rebuild with `python run_pipeline.py`)
+db/
+*.db
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

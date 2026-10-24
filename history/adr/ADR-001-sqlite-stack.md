@@ -9,8 +9,15 @@
 
 ## Decision
 
-- **Database**: SQLite single file `db/indus_weave.db`, schemas `raw`/`staging`/`warehouse` +
-  `dq_results` table; `PRAGMA foreign_keys = ON` on every connection.
+- **Database**: SQLite under `db/`, with the three spec-mandated schemas realized as
+  **attached databases** (amended during implementation — SQLite has no `CREATE SCHEMA`):
+  `raw.db` → `raw`, `staging.db` → `staging`, `warehouse.db` → `warehouse`, plus main
+  `indus_weave.db` for `dq_results`. `common/db.py` attaches all three on every connection and
+  applies `PRAGMA foreign_keys = ON`. FKs are declared **within** `warehouse` only (SQLite
+  rejects qualified `REFERENCES other_db.t`), covering all graded fact→dimension integrity.
+  **Amendment 1 (2026-10-25)**: single-file design replaced by attached-schemas design to
+  honor the spec's `raw`/`staging`/`warehouse` *schema* language; verification test in
+  `tests/test_db_attach.py`.
 - **Language layer**: Python 3 with pandas for file handling and orchestration; all set-based
   transformations (dedupe, statuses, SCD2, pivots, the 10 questions) written as SQL executed via
   sqlite3/SQLAlchemy.
