@@ -1,4 +1,4 @@
-﻿---
+---
 
 description: "Task list for Indus Weave HR data warehouse pipeline (001-hr-pipeline)"
 ---
@@ -65,16 +65,16 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: typed staging + quarantines + logs (Rules 1â€“2, 5â€“11, 16â€“18)
 **Independent Test**: `raw = staging + rejected` per table; dedupe log populated; drift doc written
 
-- [ ] T015 [P] [US2] `transform/01_clean_employees.py`: mixed date formats â†’ ISO (3 formats), trim/normalize department strings to `dept_id` (casing, spaces, old names via `previous_name`), dedupe on latest `updated_at` â†’ `staging.employees` + `staging.employees_dedupe_log` (Rules 1, 3) (FR-006/007)
-- [ ] T016 [US2] `transform/02_clean_history.py`: recompute `valid_to_calc = next.effective_from âˆ’ 1 day`, latest NULL; keep `_raw_effective_to`; flag/log the 37 overlap-or-gap employees (Rule 2) (FR-008)
-- [ ] T017 [P] [US2] `transform/03_clean_reference.py`: departments (canonical + 2 renames), shifts JSON â†’ table, holidays with scope codes, roster **gap-fill forward-fill** (Rules 5, 6) (FR-015)
-- [ ] T018 [US2] `transform/04_punches.py` **part A â€” mapping**: composite-key join, unmapped â†’ `staging.rejected_punches` with reason (Rule 8) (FR-010)
-- [ ] T019 [US2] `transform/04_punches.py` **part B â€” drift**: per-device avg first-punch time vs roster shift start â†’ identify offset device; apply offset; write `staging.drift_corrections` with method + before/after evidence (Rule 11) (FR-011) + docs paragraph for README
-- [ ] T020 [US2] `transform/04_punches.py` **part C â€” 2-min dedupe**: SQL LAG window over `(emp_id, punch_time)`; collapse pairs < 2 min; count collapsed (Rule 9) (FR-012)
-- [ ] T021 [US2] `transform/05_leave.py`: flatten JSON â†’ `leave_requests` (with `is_counted`: both steps Approved + not cancelled), `leave_approval_steps`, `leave_days` (range âˆ’ Sundays âˆ’ plant holidays) (Rules 16, 17) (FR-013/014)
-- [ ] T022 [P] [US2] `transform/06_overtime_payroll.py`: OT requests typed + approved-only view; payroll lines typed (Rule 19/20/21) (FR-019-adjacent prep)
-- [ ] T023 [US2] Reconciliation helper in `quality/checks.py` skeleton: `raw = staging + rejected` per table (reused in Stage 6)
-- [ ] T024 [US2] `tests/test_staging_invariants.py`: ISO dates only, dept resolution 100%, dedupe log non-empty, rejects have reasons, no leave_day on Sunday/holiday (SC-003) â†’ **Gate S**
+- [x] T015 [P] [US2] `transform/01_clean_employees.py`: mixed date formats â†’ ISO (3 formats), trim/normalize department strings to `dept_id` (casing, spaces, old names via `previous_name`), dedupe on latest `updated_at` â†’ `staging.employees` + `staging.employees_dedupe_log` (Rules 1, 3) (FR-006/007)
+- [x] T016 [US2] `transform/02_clean_history.py`: recompute `valid_to_calc = next.effective_from âˆ’ 1 day`, latest NULL; keep `_raw_effective_to`; flag/log the 37 overlap-or-gap employees (Rule 2) (FR-008)
+- [x] T017 [P] [US2] `transform/03_clean_reference.py`: departments (canonical + 2 renames), shifts JSON â†’ table, holidays with scope codes, roster **gap-fill forward-fill** (Rules 5, 6) (FR-015)
+- [x] T018 [US2] `transform/04_punches.py` **part A â€” mapping**: composite-key join, unmapped â†’ `staging.rejected_punches` with reason (Rule 8) (FR-010)
+- [x] T019 [US2] `transform/04_punches.py` **part B â€” drift**: per-device avg first-punch time vs roster shift start â†’ identify offset device; apply offset; write `staging.drift_corrections` with method + before/after evidence (Rule 11) (FR-011) + docs paragraph for README
+- [x] T020 [US2] `transform/04_punches.py` **part C â€” 2-min dedupe**: SQL LAG window over `(emp_id, punch_time)`; collapse pairs < 2 min; count collapsed (Rule 9) (FR-012)
+- [x] T021 [US2] `transform/05_leave.py`: flatten JSON â†’ `leave_requests` (with `is_counted`: both steps Approved + not cancelled), `leave_approval_steps`, `leave_days` (range âˆ’ Sundays âˆ’ plant holidays) (Rules 16, 17) (FR-013/014)
+- [x] T022 [P] [US2] `transform/06_overtime_payroll.py`: OT requests typed + approved-only view; payroll lines typed (Rule 19/20/21) (FR-019-adjacent prep)
+- [x] T023 [US2] Reconciliation helper in `quality/checks.py` skeleton: `raw = staging + rejected` per table (reused in Stage 6)
+- [x] T024 [US2] `tests/test_staging_invariants.py`: ISO dates only, dept resolution 100%, dedupe log non-empty, rejects have reasons, no leave_day on Sunday/holiday (SC-003) â†’ **Gate S**
 
 **Checkpoint**: Gate S â€” staging trusted; Checkpoint 1 staging portion done
 
@@ -160,7 +160,7 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 
 ## Phase 10: Polish & Cross-Cutting
 
-- [ ] T057 [P] `docs/profile_notes.md` finalized: profiling outputs + planted-issues inventory (SC-003 evidence)
+- [x] T057 [P] `docs/profile_notes.md` finalized: profiling outputs + planted-issues inventory (SC-003 evidence)
 - [ ] T058 [P] PHRs for each major prompt in `history/prompts/001-hr-pipeline/` (opencode.md compliance)
 - [ ] T059 Final green run: `python run_pipeline.py` from clean `db/` â†’ all gates PASS, 10 CSVs, dq_results green; commit
 - [ ] T060 Create public GitHub repo, push before code freeze; verify README renders
