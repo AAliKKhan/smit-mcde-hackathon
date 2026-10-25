@@ -1,11 +1,10 @@
-"""T023 - Reconciliation: raw = staging + rejected, per table.
+"""T023/T029/T036 - Reconciliation + integrity checks.
 
-Used by Gate S tests (tests/test_staging_invariants.py) and by Stage 6 DQ
-(FR-045+): every raw row must be accounted for - kept in staging, rejected
-with a reason, or (for employees) logged in the dedupe log. shift_roster is
-the one table allowed to GAIN rows (Rule 6 gap-fill).
+Raw = staging + rejected per table (Gate S), attendance_daily invariants
+(SC-004), and warehouse RI/SCD2/parity checks (Gate W). Every check counts
+VIOLATIONS (0 = pass); CLI exits 1 on any failure.
 
-Run: python -m quality.checks   (exit 1 on any imbalance)
+Run: python -m quality.checks
 """
 
 from __future__ import annotations
@@ -150,6 +149,93 @@ def attendance_checks() -> list[dict]:
     return checks
 
 
+def warehouse_checks() -> list[dict]:
+    """T036 / Gate W: warehouse integrity -> [{check, violations, ok, note}].
+
+    Referential integrity over every fact (PRAGMA foreign_key_check), SCD2
+    validity (no overlap, no gap, exactly one current row per employee),
+    dim_date window coverage, fact<->staging row parity, and status
+    distribution parity for the attendance fact.
+    """
+    from config import DIM_DATE_END, WINDOW_START
+
+    checks: list[dict] = []
+
+    def add(name: str, violations: int, note: str = "") -> None:
+        checks.append({"check": name, "violations": int(violations),
+                       "ok": int(violations) == 0, "note": note})
+
+    c = db.conn()
+    try:
+        fk = len(c.execute("PRAGMA warehouse.foreign_key_check").fetchall())
+    finally:
+        c.close()
+    add("foreign_key_integrity", fk,
+        "all fact FKs resolve inside db/warehouse.db")
+
+    add("scd2_no_overlap",
+        _n("SELECT COUNT(*) FROM warehouse.dim_employee a "
+           "JOIN warehouse.dim_employee b ON a.emp_id = b.emp_id "
+           " AND a.employee_key <> b.employee_key "
+           " AND a.valid_from <= COALESCE(b.valid_to, '9999-12-31') "
+           " AND COALESCE(a.valid_to, '9999-12-31') >= b.valid_from "
+           " AND a.valid_from < b.valid_from"),
+        "no two versions of an employee overlap (Rule 2)")
+
+    add("scd2_contiguous",
+        _n("SELECT COUNT(*) FROM ("
+           "  SELECT valid_to, LEAD(valid_from) OVER "
+           "    (PARTITION BY emp_id ORDER BY valid_from) nxt "
+           "  FROM warehouse.dim_employee) "
+           "WHERE nxt IS NOT NULL AND valid_to <> date(nxt, '-1 day')"),
+        "valid_to = next valid_from - 1 day; no gaps between versions")
+
+    add("scd2_one_current_per_emp",
+        _n("SELECT COUNT(*) FROM (SELECT emp_id FROM warehouse.dim_employee "
+           "GROUP BY emp_id HAVING SUM(is_current) <> 1)"),
+        "exactly one open (is_current) version per employee")
+
+    expected_days = (DIM_DATE_END - WINDOW_START).days + 1
+    add("dim_date_covers_window",
+        abs(expected_days - _n("SELECT COUNT(*) FROM warehouse.dim_date"))
+        + _n("SELECT COUNT(*) FROM warehouse.dim_date WHERE date_key < "
+             f"'{WINDOW_START.isoformat()}' OR date_key > "
+             f"'{DIM_DATE_END.isoformat()}'"),
+        f"exactly {expected_days} days {WINDOW_START}..{DIM_DATE_END}")
+
+    add("fact_row_parity",
+        _n("SELECT ABS((SELECT COUNT(*) FROM warehouse.fact_attendance_daily)"
+           " - (SELECT COUNT(*) FROM staging.attendance_daily))"
+           " + ABS((SELECT COUNT(*) FROM warehouse.fact_leave_day)"
+           " - (SELECT COUNT(*) FROM staging.leave_days))"
+           " + ABS((SELECT COUNT(*) FROM warehouse.fact_overtime_approved)"
+           " - (SELECT COUNT(*) FROM staging.overtime_requests "
+           "     WHERE status = 'Approved'))"
+           " + ABS((SELECT COUNT(*) FROM warehouse.fact_payroll_line)"
+           " - (SELECT COUNT(*) FROM staging.payroll_lines))"),
+        "every eligible staging row landed in its fact")
+
+    add("status_distribution_parity",
+        _n("SELECT "
+           " (SELECT COUNT(*) FROM ("
+           "    SELECT status, COUNT(*) n FROM warehouse.fact_attendance_daily"
+           "    GROUP BY status"
+           "    EXCEPT SELECT status, COUNT(*) n"
+           "           FROM staging.attendance_daily GROUP BY status))"
+           " + (SELECT COUNT(*) FROM ("
+           "    SELECT status, COUNT(*) n FROM staging.attendance_daily"
+           "    GROUP BY status"
+           "    EXCEPT SELECT status, COUNT(*) n"
+           "           FROM warehouse.fact_attendance_daily GROUP BY status))"),
+        "per-status totals identical fact vs staging")
+
+    add("payroll_month_end_dept_present",
+        _n("SELECT COUNT(*) FROM warehouse.fact_payroll_line "
+           "WHERE dept_id_month_end IS NULL"),
+        "Rule 3: every payslip line resolves a month-end department")
+    return checks
+
+
 def main() -> int:
     rows = reconciliation_report()
     print(f"{'table':<24}{'raw':>9}{'staged':>9}{'rejected':>9}{'extra':>7}  ok  note")
@@ -168,13 +254,21 @@ def main() -> int:
         print(f"  {flag}  {c['check']:<32} violations={c['violations']:<7,} {c['note']}")
     bad_att = [c for c in att if not c["ok"]]
 
+    wh = warehouse_checks()
+    print("\nwarehouse integrity (T036 / Gate W):")
+    for c in wh:
+        flag = "PASS" if c["ok"] else "FAIL"
+        print(f"  {flag}  {c['check']:<32} violations={c['violations']:<7,} {c['note']}")
+    bad_wh = [c for c in wh if not c["ok"]]
+
     bad = [r for r in rows if not r["ok"]]
-    if bad or not steps["ok"] or bad_att:
+    if bad or not steps["ok"] or bad_att or bad_wh:
         print(f"\nRECONCILIATION FAILED: {len(bad)} table(s), "
-              f"{len(bad_att)} attendance check(s)")
+              f"{len(bad_att)} attendance check(s), {len(bad_wh)} warehouse check(s)")
         return 1
     print("\nreconciliation OK: raw = staging + rejected for every table")
     print("attendance invariants OK: SC-004 satisfied")
+    print("warehouse integrity OK: RI + SCD2 + parity satisfied")
     return 0
 
 

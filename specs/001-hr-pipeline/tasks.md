@@ -98,13 +98,13 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: `warehouse.*` dims/facts with enforced keys + SCD2 + ER diagram (Rules 2, 3)
 **Independent Test**: RI query 0 orphans; SCD2 no overlaps; ERD committed
 
-- [ ] T030 [US4] `warehouse/build_warehouse.py` **part A â€” `dim_date`**: pandas `date_range` 2026-04-01â†’2026-10-31 with day/month/week/weekday/is_weekend/is_holiday_all flags (research R1/R8)
-- [ ] T031 [US4] **part B â€” `dim_employee` SCD2**: `LEAD(effective_from)âˆ’1d` build, surrogate keys, `is_current`, contiguous/non-overlapping (Rule 2, FR-026)
-- [ ] T032 [P] [US4] **part C â€” `dim_department`, `dim_shift`** from staging
-- [ ] T033 [US4] **part D â€” facts**: `fact_attendance_daily`, `fact_leave_day`, `fact_overtime_approved` (approved only), `fact_payroll_line` with `dept_id_month_end` via SCD2 at month end / last working day (Rule 3, FR-028/029)
-- [ ] T034 [US4] Enforce FKs: load order dimsâ†’facts; `PRAGMA foreign_key_check` after load = 0 rows
-- [ ] T035 [P] [US4] ER diagram: `warehouse/erd.dbml` source + dbdiagram.io/draw.io export â†’ `warehouse/erd.png` (FR-030)
-- [ ] T036 [US4] DQ: RI checks all facts, SCD2 overlap check â†’ **Gate W**
+- [x] T030 [US4] `warehouse/build_warehouse.py` **part A â€” `dim_date`**: pandas `date_range` 2026-04-01â†’2026-10-31 with day/month/week/weekday/is_weekend/is_holiday_all flags (research R1/R8)
+- [x] T031 [US4] **part B â€” `dim_employee` SCD2**: `LEAD(effective_from)âˆ’1d` build, surrogate keys, `is_current`, contiguous/non-overlapping (Rule 2, FR-026)
+- [x] T032 [P] [US4] **part C â€” `dim_department`, `dim_shift`** from staging
+- [x] T033 [US4] **part D â€” facts**: `fact_attendance_daily`, `fact_leave_day`, `fact_overtime_approved` (approved only), `fact_payroll_line` with `dept_id_month_end` via SCD2 at month end / last working day (Rule 3, FR-028/029)
+- [x] T034 [US4] Enforce FKs: load order dimsâ†’facts; `PRAGMA foreign_key_check` after load = 0 rows
+- [x] T035 [P] [US4] ER diagram: `warehouse/erd.dbml` source + dbdiagram.io/draw.io export â†’ `warehouse/erd.png` (FR-030; PNG regenerated locally via `python -m warehouse.make_erd`)
+- [x] T036 [US4] DQ: RI checks all facts, SCD2 overlap check â†’ **Gate W**
 
 **Checkpoint**: Checkpoint 2 prerequisite â€” warehouse built
 

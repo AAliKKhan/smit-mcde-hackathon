@@ -1,0 +1,129 @@
+// PeopleOps warehouse star schema - Indus Weave Textiles pilot (T035, FR-030)
+// Mirrors warehouse/ddl/20_warehouse.sql (source of truth for columns/FKs).
+// Render: paste into https://dbdiagram.io/d  -or-  python -m warehouse.make_erd
+// which regenerates warehouse/erd.png from the same column sets.
+
+Project peopleops {
+  database_type: 'SQLite'
+  Note: '''
+    Star schema over the 6-month HCM export (2026-04-01 .. 2026-09-30) for the
+    Indus Weave Textiles pilot. dim_employee is SCD2 (Rule 2):
+    fact date BETWEEN valid_from AND COALESCE(valid_to, 9999-12-31).
+    fact_payroll_line.dept_id_month_end = department at month end / last
+    working day (Rule 3). All FKs are intra-warehouse (db/warehouse.db).
+    Facts carry business keys (emp_id, work_date, ...) beside the surrogate
+    FKs purely for readability - grain is defined by the PKs.
+  '''
+}
+
+Table dim_date [header: yellow] {
+  date_key    varchar [pk, note: 'YYYY-MM-DD, 2026-04-01..2026-10-31']
+  day         int [not null]
+  month       varchar [not null, note: 'YYYY-MM']
+  month_start varchar [not null]
+  month_end   varchar [not null]
+  week_start  varchar [not null, note: 'Monday of that week']
+  weekday_no  int [not null, note: '1=Mon .. 7=Sun']
+  weekday_name varchar [not null]
+  is_weekend  int [not null, note: '1 = Sunday (Rule 4)']
+  is_holiday_all int [not null, note: 'scope=ALL holiday flag']
+  holiday_name varchar
+}
+
+Table dim_employee [header: green] {
+  employee_key integer [pk, note: 'surrogate, SCD2 version key']
+  emp_id       varchar [not null, note: 'business key, non-unique here']
+  full_name    varchar
+  gender       varchar
+  date_of_birth varchar
+  plant        varchar
+  dept_id      varchar
+  dept_name    varchar
+  designation  varchar
+  grade        varchar
+  employment_type varchar
+  status       varchar
+  hire_date    varchar
+  separation_date varchar
+  annual_leave_entitlement int
+  basic_salary float
+  change_reason varchar
+  valid_from   varchar [not null]
+  valid_to     varchar, note: 'inclusive; NULL = open/current'
+  is_current   int [not null, note: '0/1, exactly one per emp_id']
+}
+
+Table dim_department [header: green] {
+  dept_id   varchar [pk]
+  dept_name varchar [not null]
+  plant     varchar [not null]
+  cost_center varchar
+  previous_name varchar
+  renamed_on varchar
+}
+
+Table dim_shift [header: green] {
+  shift_code varchar [pk]
+  name       varchar
+  start_time varchar [not null]
+  end_time   varchar [not null]
+  crosses_midnight int [not null, note: '0/1']
+  grace_minutes int [not null]
+  applies_to varchar
+}
+
+Table fact_attendance_daily [header: red] {
+  employee_key integer [not null, ref: > dim_employee.employee_key]
+  date_key     varchar [not null, ref: > dim_date.date_key]
+  shift_code   varchar [ref: > dim_shift.shift_code]
+  emp_id       varchar [not null, note: 'denormalised for queries']
+  work_date    varchar [not null]
+  plant        varchar
+  dept_id      varchar [ref: > dim_department.dept_id, note: 'dept at day']
+  status       varchar [not null, note: 'Rule 12 CASE chain']
+  punches_count int [not null]
+  worked_hours float [not null]
+  late_minutes int [not null]
+  early_leave_minutes int [not null]
+  ot_hours     float [not null, note: 'Rule 14 half-hours']
+  is_working_day int [not null]
+  Note: 'grain: one row per employee per work_date (217,584 rows)'
+}
+
+Table fact_leave_day [header: red] {
+  employee_key integer [not null, ref: > dim_employee.employee_key]
+  date_key     varchar [not null, ref: > dim_date.date_key]
+  request_id   varchar [not null]
+  emp_id       varchar [not null]
+  leave_type   varchar
+  plant        varchar
+  dept_id      varchar [ref: > dim_department.dept_id]
+  Note: 'grain: one row per countable leave day (is_counted requests only, Rule 16)'
+}
+
+Table fact_overtime_approved [header: red] {
+  request_id   varchar [pk]
+  employee_key integer [not null, ref: > dim_employee.employee_key]
+  date_key     varchar [not null, ref: > dim_date.date_key]
+  emp_id       varchar [not null]
+  ot_date      varchar [not null]
+  approved_hours float
+  requested_hours float
+  plant        varchar
+  dept_id      varchar [ref: > dim_department.dept_id]
+  Note: 'grain: one APPROVED overtime request (Rule 19)'
+}
+
+Table fact_payroll_line [header: red] {
+  line_id      varchar [pk]
+  employee_key integer [not null, ref: > dim_employee.employee_key]
+  payroll_month varchar [not null, note: 'YYYY-MM']
+  emp_id       varchar [not null]
+  component    varchar [not null]
+  component_type varchar [not null, note: 'EARNING | DEDUCTION']
+  units        float
+  amount       float
+  plant        varchar
+  dept_id_month_end varchar [ref: > dim_department.dept_id, note: 'Rule 3 month-end dept']
+  Note: 'grain: one payslip line; cost = SUM(amount WHERE component_type = EARNING) (Rule 21)'
+}
