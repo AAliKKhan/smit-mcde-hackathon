@@ -148,11 +148,11 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: one-command rebuild + findings + deck + README
 **Independent Test**: clean-clone rebuild per quickstart.md; evidence queries reproduce numbers
 
-- [ ] T052 [US7] `run_pipeline.py`: stages in plan.md order, `--stage` flag for partial runs, timing summary, exits non-zero on any gate failure (FR-051)
-- [ ] T053 [US7] `README.md`: mentor rebuild (quickstart.md content), design decisions, **drift-correction write-up**, rule-citation map, team members, rubric artifact map (FR-052)
-- [ ] T054 [US7] Analyze q05â€“q08 outputs â†’ write `presentation/cfo_findings.md`: exactly 3 findings, each = number + evidence query + recommended action (FR-055)
-- [ ] T055 [P] [US7] `presentation/slides.pdf` â‰¤ 6 slides (problem, pipeline, finding 1â€“3, ask)
-- [ ] T056 [US7] Demo rehearsal: 5-min script, every team member can explain any line (FR-057)
+- [x] T052 [US7] `run_pipeline.py`: stages in plan.md order, `--stage` flag for partial runs, timing summary, exits non-zero on any gate failure (FR-051)
+- [x] T053 [US7] `README.md`: mentor rebuild (quickstart.md content), design decisions, **drift-correction write-up**, rule-citation map, team members, rubric artifact map (FR-052)
+- [x] T054 [US7] Analyze q05â€“q08 outputs â†’ write `presentation/cfo_findings.md`: exactly 3 findings, each = number + evidence query + recommended action (FR-055)
+- [x] T055 [P] [US7] `presentation/slides.pdf` â‰¤ 6 slides (problem, pipeline, finding 1â€“3, ask)
+- [x] T056 [US7] Demo rehearsal: 5-min script, every team member can explain any line (FR-057)
 
 **Checkpoint**: **Gate P** â€” ready for demo
 
@@ -161,8 +161,8 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 ## Phase 10: Polish & Cross-Cutting
 
 - [x] T057 [P] `docs/profile_notes.md` finalized: profiling outputs + planted-issues inventory (SC-003 evidence)
-- [ ] T058 [P] PHRs for each major prompt in `history/prompts/001-hr-pipeline/` (opencode.md compliance)
-- [ ] T059 Final green run: `python run_pipeline.py` from clean `db/` â†’ all gates PASS, 10 CSVs, dq_results green; commit
+- [x] T058 [P] PHRs for each major prompt in `history/prompts/001-hr-pipeline/` (opencode.md compliance)
+- [x] T059 Final green run: `python run_pipeline.py` from clean `db/` â†’ all gates PASS, 10 CSVs, dq_results green; commit
 - [ ] T060 Create public GitHub repo, push before code freeze; verify README renders
 
 ## Dependencies & Execution Order
