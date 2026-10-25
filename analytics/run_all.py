@@ -1,9 +1,10 @@
-"""T037 - run every analytics/q*.sql against the warehouse, export CSVs.
+"""T037 - run every analytics/*.sql against the warehouse, export CSVs.
 
-Discovers `analytics/q*.sql` (sorted), executes each file as one standalone
-statement (FR-031), writes `analytics/results/<stem>.csv` (FR-033) and prints
-row counts. Exits non-zero if a query fails or returns no rows, so Gate Q
-can rely on the exit code.
+Discovers `analytics/*.sql` (sorted: bonus `b*.sql` first, then `q*.sql`),
+executes each file as one standalone statement (FR-031), writes
+`analytics/results/<stem>.csv` (FR-033) and prints row counts. Exits
+non-zero if a query fails or returns no rows, so Gate Q can rely on the
+exit code.
 
 Run:  python -m analytics.run_all             # all queries
       python -m analytics.run_all q05 q07     # only the given stems
@@ -21,12 +22,12 @@ RESULTS = HERE / "results"
 
 
 def run(stems: list[str] | None = None) -> int:
-    files = sorted(HERE.glob("q*.sql"))
+    files = sorted(HERE.glob("*.sql"))
     if stems:
         wanted = set(stems)
         files = [f for f in files if f.stem in wanted]
     if not files:
-        print("no analytics/q*.sql files found")
+        print("no analytics/*.sql files found")
         return 1
     RESULTS.mkdir(exist_ok=True)
 

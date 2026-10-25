@@ -1,0 +1,6 @@
+step,stage,reached,conversion_from_prev_pct,pct_of_applied,previous_stage,median_days_in_previous_stage
+1,Applied,1400,,100.0,,
+2,Screened,682,48.7,48.7,Applied,9.0
+3,Interviewed,263,38.6,18.8,Screened,8.0
+4,Offered,90,34.2,6.4,Interviewed,9.0
+5,Hired,74,82.2,5.3,Offered,8.0

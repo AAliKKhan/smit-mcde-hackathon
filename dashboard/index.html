@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Indus Weave HR Control Tower</title>
+<style>
+ body { font-family: 'Segoe UI', sans-serif; margin: 0; background:#f4f6f8; color:#17212b; }
+ header { background:#006c63; color:#fff; padding:22px 32px; }
+ header h1 { margin:0; font-size:26px; } header p { margin:6px 0 0; opacity:.9; }
+ main { padding:24px 32px; max-width:1200px; margin:0 auto; }
+ .kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
+ .kpi { background:#fff; border-radius:10px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+ .kpi .v { font-size:26px; font-weight:700; color:#006c63; }
+ .kpi .l { font-size:12px; color:#5a6876; margin-top:4px; text-transform:uppercase; }
+ .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+ .card { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+ .card h2 { margin:0 0 14px; font-size:16px; color:#006c63; }
+ .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; font-size:13px; }
+ .bar-lbl { width:64px; color:#5a6876; }
+ .bar { height:16px; background:linear-gradient(90deg,#006c63,#3fae9f); border-radius:3px; min-width:2px; }
+ .bar-val { margin-left:6px; font-variant-numeric:tabular-nums; }
+ table { width:100%; border-collapse:collapse; font-size:13px; }
+ th, td { text-align:right; padding:7px 8px; border-bottom:1px solid #e6eaee; }
+ th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
+ th { color:#5a6876; font-weight:600; }
+ tr.hot td { background:#fff3f1; color:#b03a2e; font-weight:600; }
+ .findings { grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+ .find { background:#fff; border-left:5px solid #b03a2e; padding:14px 16px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+ .find .n { font-size:22px; font-weight:700; color:#b03a2e; }
+ .find .t { font-size:13px; color:#5a6876; margin-top:6px; }
+ footer { text-align:center; color:#5a6876; font-size:12px; padding:18px; }
+</style></head><body>
+<header>
+ <h1>Indus Weave Textiles &mdash; HR Control Tower</h1>
+ <p>Apr&ndash;Sep 2026 &middot; built on warehouse.* by dashboard/build_dashboard.py
+ &middot; DQ 58 PASS</p>
+</header>
+<main>
+ <div class="kpis">
+  <div class="kpi"><div class="v">1,176</div><div class="l">Headcount (Sep 30)</div></div>
+  <div class="kpi"><div class="v">90</div><div class="l">Separations (6 mo)</div></div>
+  <div class="kpi"><div class="v">PKR 695.0 M</div><div class="l">Payroll cost</div></div>
+  <div class="kpi"><div class="v">PKR 19.0 M</div><div class="l">Overtime paid</div></div>
+  <div class="kpi"><div class="v">58</div><div class="l">DQ checks passing</div></div>
+ </div>
+ <div class="grid">
+  <div class="card"><h2>Month-end headcount</h2><div class="bar-row"><span class="bar-lbl">2026-04</span><div class="bar" style="width:100.0%"></div><span class="bar-val">1,199</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-05</span><div class="bar" style="width:99.7%"></div><span class="bar-val">1,196</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-06</span><div class="bar" style="width:99.4%"></div><span class="bar-val">1,192</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-07</span><div class="bar" style="width:98.1%"></div><span class="bar-val">1,176</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-08</span><div class="bar" style="width:98.6%"></div><span class="bar-val">1,182</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-09</span><div class="bar" style="width:98.1%"></div><span class="bar-val">1,176</span></div></div>
+  <div class="card"><h2>Payroll cost by month (PKR)</h2><div class="bar-row"><span class="bar-lbl">2026-04</span><div class="bar" style="width:91.5%"></div><span class="bar-val">110,945,107</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-05</span><div class="bar" style="width:91.4%"></div><span class="bar-val">110,746,861</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-06</span><div class="bar" style="width:92.0%"></div><span class="bar-val">111,460,953</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-07</span><div class="bar" style="width:100.0%"></div><span class="bar-val">121,207,135</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-08</span><div class="bar" style="width:99.4%"></div><span class="bar-val">120,444,670</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-09</span><div class="bar" style="width:99.2%"></div><span class="bar-val">120,214,452</span></div></div>
+  <div class="card"><h2>Absenteeism rate by month (%)</h2><div class="bar-row"><span class="bar-lbl">2026-04</span><div class="bar" style="width:97.4%"></div><span class="bar-val">3.36</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-05</span><div class="bar" style="width:96.5%"></div><span class="bar-val">3.33</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-06</span><div class="bar" style="width:97.7%"></div><span class="bar-val">3.37</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-07</span><div class="bar" style="width:93.9%"></div><span class="bar-val">3.24</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-08</span><div class="bar" style="width:92.8%"></div><span class="bar-val">3.20</span></div>
+<div class="bar-row"><span class="bar-lbl">2026-09</span><div class="bar" style="width:100.0%"></div><span class="bar-val">3.45</span></div></div>
+  <div class="card"><h2>Overtime: computed vs paid (top overage depts)</h2><table><tr><th>department</th><th>plant</th><th>computed h</th><th>paid h</th><th>paid PKR</th><th>overage h</th></tr>
+<tr class="hot"><td>Stitching</td><td>Faisalabad Plant</td><td>4,901.0</td><td>7,659.0</td><td>3,771,337</td><td>+2,758.0</td></tr>
+<tr><td>Compliance</td><td>Head Office</td><td>202.5</td><td>187.5</td><td>256,259</td><td>-15.0</td></tr>
+<tr><td>Human Resources</td><td>Head Office</td><td>235.0</td><td>208.0</td><td>239,598</td><td>-27.0</td></tr>
+<tr><td>IT</td><td>Head Office</td><td>204.5</td><td>175.5</td><td>161,737</td><td>-29.0</td></tr>
+<tr><td>Administration</td><td>Head Office</td><td>295.5</td><td>263.0</td><td>328,441</td><td>-32.5</td></tr>
+<tr><td>Sales & Marketing</td><td>Head Office</td><td>345.0</td><td>299.0</td><td>395,513</td><td>-46.0</td></tr>
+<tr><td>Finance</td><td>Head Office</td><td>381.5</td><td>333.0</td><td>353,669</td><td>-48.5</td></tr>
+<tr><td>Supply Chain</td><td>Head Office</td><td>312.5</td><td>262.0</td><td>253,014</td><td>-50.5</td></tr></table></div>
+  <div class="findings">
+   <div class="find"><div class="n">+2,758 h</div>
+     <div class="t">Finding 1 &mdash; Stitching paid overtime beyond punch-computed hours
+     (q06)</div></div>
+   <div class="find"><div class="n">PKR 2,879,197</div>
+     <div class="t">Finding 2 &mdash; pay for zero-attendance months, excluding
+     post-separation (q07/q08 split)</div></div>
+   <div class="find"><div class="n">PKR 1,948,000</div>
+     <div class="t">Finding 3 &mdash; pay after separation date (q08)</div></div>
+  </div>
+ </div>
+</main>
+<footer>Regenerate: <code>python -m dashboard.build_dashboard</code>
+ &middot; numbers query warehouse tables live &middot; Indus Weave is fictional, data is synthetic</footer>
+</body></html>

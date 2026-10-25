@@ -188,3 +188,12 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 - Never edit `data/` (Principle II); every fix in code with rule citation (Principle I/V).
 - Commit after each task or logical group; message references task IDs (e.g., `T010 raw loader`).
 - Stop at each Gate checkpoint and validate before proceeding.
+
+---
+
+## Phase 11: Bonus tasks (guide, up to 10 points)
+
+- [x] T061 `run_pipeline.py` one-command rebuild (guide bonus 1; delivered with T052)
+- [x] T062 Incremental load: `ingestion/load_incremental.py` + `tests/test_incremental.py` (append-only delta on a key, idempotent re-run, in-file dedupe; default re-check of punches = 0 appended)
+- [x] T063 Recruitment funnel: `analytics/b01_recruitment_funnel.sql` (conversion % + median days per stage) wired into `run_all`
+- [x] T064 Dashboard: `dashboard/build_dashboard.py` -> `dashboard/index.html` (KPIs, headcount/payroll/absenteeism bars, OT overage table, 3 finding numbers - all queried from warehouse.*)

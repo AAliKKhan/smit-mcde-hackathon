@@ -33,8 +33,10 @@ python -m transform.build             # Stage 2+3 → staging.*      Gates S + A
 python -m warehouse.build_warehouse   # Stage 4 → warehouse.*      Gate W
 python -m analytics.run_all           # Stage 5 → results/*.csv    Gate Q
 python -m quality.run_dq              # Stage 6 → dq_results       Gate D
+python -m ingestion.load_incremental  # bonus: append only new rows (delta load)
+python -m dashboard.build_dashboard   # bonus: rebuild dashboard/index.html
 python run_pipeline.py --stage 4      # or any single stage
-python -m pytest tests/ -q            # 32 tests
+python -m pytest tests/ -q            # 33 tests
 ```
 
 **60-second verification**
@@ -159,16 +161,17 @@ Deck: `presentation/slides.pdf` (6 slides). Demo script:
 run_pipeline.py            one-command rebuild (stages 1→6, --stage N)
 config.py                  paths, expected counts, file→table map
 common/db.py               connection factory, PRAGMAs, attach helper
-ingestion/                 load_raw (raw immutable), counts gate, profiler
+ingestion/                 load_raw (raw immutable), load_incremental (delta), counts gate, profiler
 transform/                 01..07 clean → attendance (Gates S + A)
 warehouse/                 ddl/ (schemas+indexes), build_warehouse, ERD (erd.png/dbml)
-analytics/                 q01..q10.sql + run_all.py + results/*.csv
+analytics/                 q01..q10.sql + b01 funnel + run_all.py + results/*.csv
 quality/                   checks.py (families) + run_dq.py (orchestrator → dq_results)
+dashboard/                 bonus: build_dashboard.py → index.html (warehouse.* charts)
 presentation/              cfo_findings.md, slides.pdf, demo_script.md, make_slides.py
 docs/                      profile_notes, drift_analysis, history_repairs
 history/adr/               ADR-001 (SQLite), ADR-002 (attendance model)
 specs/001-hr-pipeline/     spec, plan, tasks (all gates), contracts, data-model
-tests/                     32 tests: raw counts, staging invariants, warehouse, DQ
+tests/                     33 tests: raw counts, staging invariants, warehouse, DQ
 ```
 
 ---
@@ -182,8 +185,8 @@ tests/                     32 tests: raw counts, staging invariants, warehouse, 
 | Data model (15) | `warehouse/ddl/`, `warehouse/erd.png`, SCD2 dimensions + 4 facts |
 | Data quality & reconciliation (15) | `quality/`, `main.dq_results` (58 checks), `tests/test_dq.py` |
 | CFO findings & demo (15) | `presentation/cfo_findings.md`, `slides.pdf`, `demo_script.md` |
-| Code quality & reproducibility (10) | `run_pipeline.py`, `requirements.txt`, README, 32 tests, idempotent stages |
-| **Bonus (+10)** | `warehouse/erd.png` renderer, `dq_results` run history, scripted DQ failure demo |
+| Code quality & reproducibility (10) | `run_pipeline.py`, `requirements.txt`, README, 33 tests, idempotent stages |
+| **Bonus (+10)** | `run_pipeline.py` one-command rebuild; `ingestion/load_incremental.py` (delta load); `analytics/b01_recruitment_funnel.sql`; `dashboard/index.html` (all four guide bonus tasks) |
 
 ---
 
