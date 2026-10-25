@@ -1,0 +1,22 @@
+emp_id,full_name,plant,dept_name,separation_date,payroll_month,paid_amount,days_after_separation
+E10471,Umair Baloch,Head Office,Human Resources,2026-04-23,2026-05,132000.0,8
+E10471,Umair Baloch,Head Office,Human Resources,2026-04-23,2026-06,132000.0,39
+E10471,Umair Baloch,Head Office,Human Resources,2026-04-23,2026-07,132000.0,69
+E10471,Umair Baloch,Head Office,Human Resources,2026-04-23,2026-08,132000.0,100
+E10471,Umair Baloch,Head Office,Human Resources,2026-04-23,2026-09,132000.0,131
+E10295,Sohail Hussain,SITE Plant,Finishing,2026-05-11,2026-06,63450.0,21
+E10295,Sohail Hussain,SITE Plant,Finishing,2026-05-11,2026-07,63450.0,51
+E10295,Sohail Hussain,SITE Plant,Finishing,2026-05-11,2026-08,63450.0,82
+E10295,Sohail Hussain,SITE Plant,Finishing,2026-05-11,2026-09,63450.0,113
+E10332,Amna Awan,Faisalabad Plant,Warehouse,2026-05-14,2026-06,80500.0,18
+E10332,Amna Awan,Faisalabad Plant,Warehouse,2026-05-14,2026-07,80500.0,48
+E10332,Amna Awan,Faisalabad Plant,Warehouse,2026-05-14,2026-08,80500.0,79
+E10332,Amna Awan,Faisalabad Plant,Warehouse,2026-05-14,2026-09,80500.0,110
+E11222,Naveed Ansari,SITE Plant,Dyeing,2026-05-16,2026-06,104525.0,16
+E11222,Naveed Ansari,SITE Plant,Dyeing,2026-05-16,2026-07,104525.0,46
+E11222,Naveed Ansari,SITE Plant,Dyeing,2026-05-16,2026-08,104525.0,77
+E11222,Naveed Ansari,SITE Plant,Dyeing,2026-05-16,2026-09,104525.0,108
+E10989,Tariq Jatoi,Faisalabad Plant,Packing,2026-05-18,2026-06,73525.0,14
+E10989,Tariq Jatoi,Faisalabad Plant,Packing,2026-05-18,2026-07,73525.0,44
+E10989,Tariq Jatoi,Faisalabad Plant,Packing,2026-05-18,2026-08,73525.0,75
+E10989,Tariq Jatoi,Faisalabad Plant,Packing,2026-05-18,2026-09,73525.0,106

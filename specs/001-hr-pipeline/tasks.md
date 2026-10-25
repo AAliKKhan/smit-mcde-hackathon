@@ -115,18 +115,18 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: q01â€“q10 SQL + CSVs (Q5â€“Q8 first â€” CFO story, per PDF hint)
 **Independent Test**: each runs standalone; CSVs non-empty
 
-- [ ] T037 [P] [US5] `analytics/run_all.py`: discover `analytics/q*.sql`, execute, write `analytics/results/<stem>.csv`, print row counts
-- [ ] T038 [US5] **Q5** `q05_overtime_computed_vs_approved_vs_paid.sql` â€” dept Ã— month, 3 measures (Rules 14, 15, 19, 20) (FR-038)
-- [ ] T039 [US5] **Q6** `q06_dept_paid_over_computed_15pct.sql` â€” paid > computed Ã— 1.15 (FR-039)
-- [ ] T040 [P] [US5] **Q7** `q07_paid_zero_attendance.sql` â€” payroll months with zero attendance (FR-040)
-- [ ] T041 [P] [US5] **Q8** `q08_pay_after_separation.sql` â€” pay after `separation_date` (FR-041)
-- [ ] T042 [P] [US5] **Q1** `q01_month_end_headcount.sql` â€” plant Ã— dept Ã— month (Rules 3, 4) (FR-034)
-- [ ] T043 [P] [US5] **Q2** `q02_monthly_attrition.sql` â€” separations Ã· avg headcount (FR-035); definition documented in query header
-- [ ] T044 [P] [US5] **Q3** `q03_absenteeism.sql` â€” excl. approved leave (FR-036); eligibility definition in header
-- [ ] T045 [P] [US5] **Q4** `q04_top_late_arrivals.sql` â€” top 10 + dept (FR-037)
-- [ ] T046 [P] [US5] **Q9** `q09_payroll_cost_mom.sql` â€” cost/employee by dept + MoM window fn (Rule 21, FR-042)
-- [ ] T047 [P] [US5] **Q10** `q10_leave_overuse.sql` â€” approved Annual days > entitlement (Rules 18, FR-043)
-- [ ] T048 [US5] Run all â†’ CSVs committed; spot-reconcile Q5 paid OT vs payroll pivot sum â†’ **Gate Q**
+- [x] T037 [P] [US5] `analytics/run_all.py`: discover `analytics/q*.sql`, execute, write `analytics/results/<stem>.csv`, print row counts
+- [x] T038 [US5] **Q5** `q05_overtime_computed_vs_approved_vs_paid.sql` â€” dept Ã— month, 3 measures (Rules 14, 15, 19, 20) (FR-038)
+- [x] T039 [US5] **Q6** `q06_dept_paid_over_computed_15pct.sql` â€” paid > computed Ã— 1.15 (FR-039)
+- [x] T040 [P] [US5] **Q7** `q07_paid_zero_attendance.sql` â€” payroll months with zero attendance (FR-040)
+- [x] T041 [P] [US5] **Q8** `q08_pay_after_separation.sql` â€” pay after `separation_date` (FR-041)
+- [x] T042 [P] [US5] **Q1** `q01_month_end_headcount.sql` â€” plant Ã— dept Ã— month (Rules 3, 4) (FR-034)
+- [x] T043 [P] [US5] **Q2** `q02_monthly_attrition.sql` â€” separations Ã· avg headcount (FR-035); definition documented in query header
+- [x] T044 [P] [US5] **Q3** `q03_absenteeism.sql` â€” excl. approved leave (FR-036); eligibility definition in header
+- [x] T045 [P] [US5] **Q4** `q04_top_late_arrivals.sql` â€” top 10 + dept (FR-037)
+- [x] T046 [P] [US5] **Q9** `q09_payroll_cost_mom.sql` â€” cost/employee by dept + MoM window fn (Rule 21, FR-042)
+- [x] T047 [P] [US5] **Q10** `q10_leave_overuse.sql` â€” approved Annual days > entitlement (Rules 18, FR-043)
+- [x] T048 [US5] Run all â†’ CSVs committed; spot-reconcile Q5 paid OT vs payroll pivot sum â†’ **Gate Q**
 
 **Checkpoint**: Checkpoint 2 â€” â‰¥5 questions answered (then remaining 5)
 

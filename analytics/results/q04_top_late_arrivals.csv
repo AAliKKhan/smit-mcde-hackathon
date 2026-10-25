@@ -1,0 +1,11 @@
+rank_no,emp_id,full_name,dept_name,plant,late_days,late_minutes_total
+1,E10058,Sohail Chaudhry,Dyeing,SITE Plant,81,3103
+2,E10800,Arif Rizvi,Dyeing,SITE Plant,80,3039
+3,E10422,Asif Bhatti,Quality Control,SITE Plant,77,3053
+4,E10059,Owais Baig,Quality Control,SITE Plant,77,2785
+5,E11026,Umair Ansari,Utilities,SITE Plant,76,3045
+6,E11257,Yasir Iqbal,Maintenance,SITE Plant,75,2744
+7,E10639,Haris Soomro,Maintenance,SITE Plant,75,2039
+8,E10603,Tariq Hussain,Utilities,SITE Plant,74,2805
+9,E11030,Salman Chaudhry,Finishing,SITE Plant,74,2728
+10,E10442,Junaid Mirza,Dyeing,SITE Plant,74,2427

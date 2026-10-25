@@ -1,0 +1,21 @@
+emp_id,full_name,plant,dept_name,annual_leave_entitlement,annual_days_taken,days_over_entitlement,first_annual_leave,last_annual_leave
+E10770,Danish Iqbal,Korangi Plant,Spinning,14,28,14,2026-04-01,2026-09-28
+E10826,Ahmed Mirza,SITE Plant,Finishing,14,27,13,2026-04-02,2026-09-15
+E10748,Asif Ansari,Korangi Plant,Spinning,14,25,11,2026-04-22,2026-08-22
+E10025,Arif Gill,Korangi Plant,Spinning,14,24,10,2026-05-16,2026-09-29
+E11071,Ahmed Hussain,SITE Plant,Finishing,14,23,9,2026-04-06,2026-09-12
+E10827,Sajid Abbasi,Korangi Plant,Weaving,20,27,7,2026-04-08,2026-09-29
+E10250,Yasir Akhtar,SITE Plant,Quality Control,14,20,6,2026-05-09,2026-08-08
+E10764,Adnan Jatoi,Korangi Plant,Warehouse,14,20,6,2026-05-04,2026-09-02
+E10918,Shahid Shaikh,SITE Plant,Maintenance,14,20,6,2026-04-23,2026-09-26
+E10421,Haris Abbasi,SITE Plant,Dyeing,14,19,5,2026-06-16,2026-09-26
+E10993,Hina Malik,SITE Plant,Dyeing,14,18,4,2026-05-18,2026-09-25
+E11100,Asif Akhtar,Faisalabad Plant,Stitching,14,18,4,2026-04-18,2026-09-15
+E10121,Ahmed Siddiqui,Korangi Plant,Spinning,14,17,3,2026-05-08,2026-08-15
+E10922,Ahmed Bhatti,Faisalabad Plant,Maintenance,14,17,3,2026-04-17,2026-09-04
+E10505,Tariq Hashmi,SITE Plant,Finishing,14,16,2,2026-05-05,2026-09-28
+E10706,Arif Siddiqui,Faisalabad Plant,Maintenance,14,16,2,2026-04-08,2026-09-23
+E10560,Asif Siddiqui,SITE Plant,Finishing,14,15,1,2026-04-14,2026-09-08
+E10960,Owais Ansari,Faisalabad Plant,Maintenance,14,15,1,2026-04-11,2026-09-18
+E11117,Kashif Qureshi,SITE Plant,Dyeing,14,15,1,2026-05-13,2026-07-17
+E11265,Adnan Jatoi,SITE Plant,Finishing,14,15,1,2026-05-20,2026-09-26
