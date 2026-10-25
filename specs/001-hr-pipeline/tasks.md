@@ -163,7 +163,7 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 - [x] T057 [P] `docs/profile_notes.md` finalized: profiling outputs + planted-issues inventory (SC-003 evidence)
 - [x] T058 [P] PHRs for each major prompt in `history/prompts/001-hr-pipeline/` (opencode.md compliance)
 - [x] T059 Final green run: `python run_pipeline.py` from clean `db/` â†’ all gates PASS, 10 CSVs, dq_results green; commit
-- [ ] T060 Create public GitHub repo, push before code freeze; verify README renders
+- [x] T060 Create public GitHub repo, push before code freeze; verify README renders
 
 ## Dependencies & Execution Order
 

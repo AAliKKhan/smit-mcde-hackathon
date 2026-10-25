@@ -94,7 +94,7 @@ recomputed on every run (not hard-coded).
 | 1 | Dedupe `emp_id` by latest `updated_at` | `transform/01_clean_employees.py` (50 ids / 100 rows resolved) |
 | 2 | History is source of truth; recompute `effective_to` = day before next record | `transform/02_clean_history.py` (25 overlaps, 12 gaps repaired) |
 | 3 | Month figures use department on last day of month | `warehouse/build_warehouse.py` (`fact_payroll_line.dept_id_month_end`, SCD2 join) |
-| 4 | Headcount at month end: hired ≤ month end, not separated before | `analytics/q01_headcount_monthly.sql`, `q02_separation_rate.sql` |
+| 4 | Headcount at month end: hired ≤ month end, not separated before | `analytics/q01_month_end_headcount.sql`, `q02_monthly_attrition.sql` |
 | 5 | Plant rotation DAY/EVE/NIGHT; HO & managers GEN | `transform/03_clean_reference.py`, `warehouse.dim_shift` |
 | 6 | Missing roster week → previous week's shift | `transform/04_punches.py` |
 | 7 | Night punch belongs to the shift's start date | `transform/07_attendance_daily.py` (sessionisation) |
