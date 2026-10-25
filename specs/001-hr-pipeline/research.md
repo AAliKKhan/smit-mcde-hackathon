@@ -44,16 +44,24 @@ dedupe on uncorrected times would merge wrong pairs across the drift boundary.
   punches in staging; log device, offset, method, before/after evidence in
   `staging.drift_corrections` → written up in README ("explain how you found it").
 
-## R5. Night-shift date attribution ✅ DECIDED — Rules 7, 10
+## R5. Night-shift date attribution ✅ DECIDED (amended: session model) — Rules 7, 10
 
-- Build `shift_date`: for NIGHT, if clock time < 12:00 attribute to the previous calendar
-  day (the shift started the previous 22:00), else keep the same date. This is the R5 −6h
-  intent exact: −6h alone covers only [00:00, 06:00) — 06:10 − 6h = 00:10 the same day —
-  so the 06:00–06:30 check-out stragglers in the data need the full previous-day step
+- Build `shift_date` by **shift sessionization** (revised 2026-10-25 after two heuristics
+  failed): group each employee's kept punches into sessions; a new session opens when the
+  punch lands in its rostered shift's check-IN window `[start−2h, start+3h)`, when the
+  inter-punch gap exceeds 12.5 h, when the span from the session start exceeds 16 h
+  (FR-024), or at the employee boundary. A session is dated by its **first** punch — the
+  date the shift started. All-pre-noon sessions on a NIGHT roster (lone check-outs whose
+  check-in is missing, e.g. 05:18 OUT) step back one day. Evidence that killed the simpler
+  rules: literal −6h fails for 06:00–06:30 check-outs (06:10 − 6h = 00:10 same day); a pure
+  12 h gap threshold chained an 11.68 h overnight break after a 12.21 h GEN overtime day
+  into a 35 h row, and a lone NIGHT OUT collided with the same day's night session into a
+  27 h row (gap profile is bimodal at 12 h but the bands touch). Final state: 0 rows >16 h
   (implemented in `transform/04_punches.py` part D). Pairing (first/last) runs per
   `(emp_id, shift_date)` after attribution.
 - Spillover verified: 1 Oct early check-outs must land on 30 Sep (data contract note in
-  `biometric_punches.contract.md`).
+  `biometric_punches.contract.md`) — 316 punch rows, asserted by
+  `test_night_spillover_attributed`.
 
 ## R6. Missing roster weeks (gap-fill) ✅ DECIDED — Rule 6
 

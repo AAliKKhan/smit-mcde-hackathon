@@ -96,6 +96,60 @@ def steps_reconciliation() -> dict:
             "ok": raw_steps == staged_steps}
 
 
+STATUS_DOMAIN = ("Absent", "Holiday", "Missing Punch", "On Leave",
+                 "Present", "Weekly Off")
+
+
+def attendance_checks() -> list[dict]:
+    """T029 / SC-004: attendance_daily invariants -> [{check, violations, ok}].
+
+    Every check counts VIOLATIONS (0 = pass): grain, status domain, non-negative
+    measures, half-hour OT quantization (Rule 14), no shift > 16h (FR-024),
+    status<->punches consistency with the Rule-12 CASE chain, and
+    Present-only OT/lateness (Rules 13/14).
+    """
+    att = "staging.attendance_daily"
+    checks: list[dict] = []
+
+    def add(name: str, violations_sql: str, note: str = "") -> None:
+        n = _n(violations_sql)
+        checks.append({"check": name, "violations": n, "ok": n == 0,
+                       "note": note})
+
+    add("one_row_per_emp_day",
+        f"SELECT COUNT(*) FROM (SELECT emp_id, work_date FROM {att} "
+        "GROUP BY emp_id, work_date HAVING COUNT(*) > 1)")
+    domain = ", ".join(f"'{s}'" for s in STATUS_DOMAIN)
+    add("status_in_domain",
+        f"SELECT COUNT(*) FROM {att} "
+        f"WHERE status IS NULL OR status NOT IN ({domain})",
+        "one status per day, accepted domain only (Rule 12)")
+    add("non_negative_measures",
+        f"SELECT COUNT(*) FROM {att} WHERE worked_hours < 0 OR ot_hours < 0 "
+        "OR late_minutes < 0 OR early_leave_minutes < 0")
+    add("ot_half_hour_multiples",
+        f"SELECT COUNT(*) FROM {att} "
+        "WHERE ABS(ot_hours * 2.0 - ROUND(ot_hours * 2.0)) > 1e-9",
+        "Rule 14: floored to whole half-hours")
+    add("no_shift_over_16h",
+        f"SELECT COUNT(*) FROM {att} WHERE worked_hours > 16.0",
+        "FR-024 / SC-004")
+    add("status_punches_consistent",
+        f"SELECT COUNT(*) FROM {att} WHERE "
+        "(status = 'Present'      AND punches_count < 2) OR "
+        "(status = 'Missing Punch' AND punches_count <> 1) OR "
+        "(status = 'Absent'        AND punches_count <> 0) OR "
+        "(status = 'Weekly Off'    AND punches_count <> 0) OR "
+        "(status = 'Holiday'       AND punches_count <> 0)",
+        "stored punches_count must agree with the Rule-12 CASE chain "
+        "(On Leave may keep punches)")
+    add("ot_and_lateness_only_on_present",
+        f"SELECT COUNT(*) FROM {att} WHERE status <> 'Present' AND "
+        "(ot_hours <> 0 OR late_minutes <> 0 OR early_leave_minutes <> 0)",
+        "Rules 13/14 measures are Present-only")
+    return checks
+
+
 def main() -> int:
     rows = reconciliation_report()
     print(f"{'table':<24}{'raw':>9}{'staged':>9}{'rejected':>9}{'extra':>7}  ok  note")
@@ -106,11 +160,21 @@ def main() -> int:
     steps = steps_reconciliation()
     print(f"\nleave approval steps: raw={steps['raw_steps']:,} "
           f"staged={steps['staged_steps']:,} ok={steps['ok']}")
+
+    att = attendance_checks()
+    print("\nattendance invariants (T029 / SC-004):")
+    for c in att:
+        flag = "PASS" if c["ok"] else "FAIL"
+        print(f"  {flag}  {c['check']:<32} violations={c['violations']:<7,} {c['note']}")
+    bad_att = [c for c in att if not c["ok"]]
+
     bad = [r for r in rows if not r["ok"]]
-    if bad or not steps["ok"]:
-        print(f"\nRECONCILIATION FAILED: {len(bad)} table(s)")
+    if bad or not steps["ok"] or bad_att:
+        print(f"\nRECONCILIATION FAILED: {len(bad)} table(s), "
+              f"{len(bad_att)} attendance check(s)")
         return 1
     print("\nreconciliation OK: raw = staging + rejected for every table")
+    print("attendance invariants OK: SC-004 satisfied")
     return 0
 
 

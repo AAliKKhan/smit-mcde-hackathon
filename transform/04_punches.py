@@ -14,19 +14,21 @@ Processing order is fixed by research R3 - each step's output feeds the next:
                             previous KEPT punch. Collapsed rows are kept in
                             rejected_punches (reason=duplicate_within_2min) so
                             raw = staging + rejected stays exact.
-4. **attribute** (Rule 7) : NIGHT punches with clock time < 12:00 step back one
-                            day (they close the shift that started the previous
-                            22:00), so early-morning 1 Oct check-outs land on
-                            30 Sep. A plain −6h only covers [00:00, 06:00) and
-                            strands the 06:00+ check-out stragglers on the same
-                            date (see ADR-002).
+4. **attribute** (Rule 7) : sessions open on the shift's check-IN window
+                            [start-2h, start+3h), on a gap > 12.5h, on a span
+                            > 16h, or at the employee boundary; each session
+                            is dated by its FIRST punch (the date the shift
+                            started): 1 Oct check-outs land on 30 Sep, EVE
+                            check-outs after midnight stay with their shift;
+                            lone pre-noon NIGHT check-outs move back a day
+                            (ADR-002).
 """
 
 from __future__ import annotations
 
 import pandas as pd
 
-from config import DOCS_DIR, MIN_GAP_MINUTES
+from config import DOCS_DIR, MAX_SHIFT_HOURS, MIN_GAP_MINUTES, SESSION_GAP_HOURS
 from common import db
 from transform.util import now_iso, print_counts, replace_rows
 
@@ -194,19 +196,58 @@ def main() -> dict:
     kept = mapped[mapped["_keep"]].copy()
     dropped = mapped[~mapped["_keep"]].copy()
 
-    # ---- part D: night-shift attribution (Rule 7) ---------------------------
-    # NIGHT runs 22:00 -> 06:00: a punch before noon belongs to the shift that
-    # started the PREVIOUS evening, so date(punch) must step back one day.
-    # R5's fixed -6h only covers punches in [00:00, 06:00); the data's 06:00-06:30
-    # check-out stragglers land at 00:00-00:30 the same day under -6h, which
-    # mis-pairs them with the NEXT shift's check-in (15h "worked" spans).
-    # Pre-noon -> previous day reproduces -6h for [00:00,06:00) and fixes the
-    # stragglers: 1-Oct 06:10 check-outs still attribute to 30-Sep (contract).
-    kept = _attach_shift(kept, roster, shifts)
-    night = kept["shift_code"] == "NIGHT"
-    morning = night & (kept["punch_ts"].dt.hour < 12)
-    eff = kept["punch_ts"].where(~morning, kept["punch_ts"] - pd.Timedelta(days=1))
-    kept["shift_date"] = eff.dt.strftime("%Y-%m-%d")
+    # ---- part D: shift-session attribution (Rule 7) -------------------------
+    # A session = consecutive kept punches where a new session opens when ANY
+    # of these holds (checked in order):
+    #   1. new employee (sessions never cross employees);
+    #   2. punch falls in its rostered shift's check-IN window
+    #      [start-2h, start+3h) - it is that shift's check-in, so a late OUT
+    #      (09:57) never chains with the next shift's IN (22:25);
+    #   3. inter-punch gap > 12.5h (between-shift break; within-shift max
+    #      observed 12.21h = GEN 08:46-20:58 OT day);
+    #   4. span from session start > MAX_SHIFT_HOURS (16h, FR-024).
+    # Each session is dated by its FIRST punch - "the date the shift started":
+    # NIGHT IN 21:57 + OUT 06:21 -> start date (Rule 7; 1 Oct check-outs land
+    # on 30 Sep) and EVE check-outs after midnight (00:04-00:20) stay with
+    # their shift. Exception: an all-pre-noon session on a NIGHT roster is a
+    # check-out whose check-in is missing (e.g. lone 05:18 OUT) -> dated to the
+    # PREVIOUS day, so it cannot collide on one date with that day's real night
+    # session (was 105 rows of 27h "Present").
+    # reset: _attach_shift merges reset the index to a RangeIndex; keeping a
+    # shuffled mask index would misalign first_code against session_start by
+    # label (moved ~83k punches to the wrong date in an earlier run)
+    kept = kept.sort_values(["emp_id", "punch_ts"], kind="mergesort").reset_index(drop=True)
+    max_gap = pd.Timedelta(hours=SESSION_GAP_HOURS)
+    max_span = pd.Timedelta(hours=MAX_SHIFT_HOURS)
+    kept_shift = _attach_shift(kept, roster, shifts)  # shift_code + start_time
+    st = kept_shift["start_time"]
+    win_lo = st.str.slice(0, 2).astype(float) + st.str.slice(3, 5).astype(float) / 60 - 2.0
+    win_hi = st.str.slice(0, 2).astype(float) + st.str.slice(3, 5).astype(float) / 60 + 3.0
+    tod = kept_shift["punch_ts"].dt.hour + kept_shift["punch_ts"].dt.minute / 60
+    in_window = (tod >= win_lo) & (tod < win_hi)
+    ids: list[int] = []
+    session_id = 0
+    prev_emp = None
+    start_ts = last_ts = None
+    for i, (emp, ts) in enumerate(zip(kept["emp_id"], kept["punch_ts"])):
+        if (prev_emp != emp or start_ts is None or bool(in_window.iloc[i])
+                or (ts - last_ts) > max_gap or (ts - start_ts) > max_span):
+            session_id += 1
+            start_ts = ts
+        ids.append(session_id)
+        last_ts = ts
+        prev_emp = emp
+    kept["_session"] = ids
+    kept_shift["_session"] = ids
+    session_start = kept.groupby("_session")["punch_ts"].transform("min")
+    session_end = kept.groupby("_session")["punch_ts"].transform("max")
+    first_code = kept_shift.groupby("_session")["shift_code"].transform("first")
+    lone_pre_noon_night = (
+        (session_start.dt.hour < 12) & (session_end.dt.hour < 12)
+        & first_code.eq("NIGHT")
+    )
+    shift_day = session_start - pd.to_timedelta(lone_pre_noon_night * 24, unit="h")
+    kept["shift_date"] = shift_day.dt.strftime("%Y-%m-%d")
 
     # ---- write staging -------------------------------------------------------
     out = pd.DataFrame({

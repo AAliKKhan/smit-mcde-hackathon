@@ -296,3 +296,26 @@ def test_full_reconciliation(staging_built) -> None:
     assert not bad, f"raw != staging + rejected for: {bad}"
     steps = qc.steps_reconciliation()
     assert steps["ok"], f"leave approval steps mismatch: {steps}"
+
+
+# ------------------------------------------------------- attendance (T029, SC-004)
+def _att_failed(*names: str) -> list[dict]:
+    checks = {c["check"]: c for c in qc.attendance_checks()}
+    return [checks[n] for n in names if not checks[n]["ok"]]
+
+
+def test_attendance_grain_and_status_domain(staging_built) -> None:
+    failed = _att_failed("one_row_per_emp_day", "status_in_domain")
+    assert not failed, failed
+
+
+def test_attendance_measures_valid(staging_built) -> None:
+    failed = _att_failed("non_negative_measures", "ot_half_hour_multiples",
+                         "no_shift_over_16h")
+    assert not failed, failed
+
+
+def test_attendance_status_punch_consistency(staging_built) -> None:
+    failed = _att_failed("status_punches_consistent",
+                         "ot_and_lateness_only_on_present")
+    assert not failed, failed

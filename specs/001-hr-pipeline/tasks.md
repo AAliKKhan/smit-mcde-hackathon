@@ -85,11 +85,11 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: `staging.attendance_daily` with statuses + measures (Rules 4, 7, 10, 12â€“15)
 **Independent Test**: invariants in SC-004 all pass
 
-- [ ] T025 [US3] `transform/07_attendance_daily.py` **part A â€” day spine**: employee Ã— day rows from hireâ†’min(sep, 2026-09-30), clamped to window (Rule 4)
-- [ ] T026 [US3] **part B â€” night attribution**: `shift_date` = punch date shifted for NIGHT (âˆ’6h rule) (Rule 7); pair first-in/last-out per `(emp_id, shift_date)`; single punch â†’ flag (Rule 10) (FR-019)
-- [ ] T027 [US3] **part C â€” status CASE chain** in exact Rule-12 priority: Weekly Off â†’ Holiday â†’ On Leave â†’ Present â†’ Missing Punch â†’ Absent (FR-020)
-- [ ] T028 [US3] **part D â€” measures**: worked hours, late minutes (>10 after start), early-departure (>10 before end) only on Present; OT half-hour flooring; Sunday/holiday work = all OT (Rules 13, 14, 15) (FR-021/022/023)
-- [ ] T029 [US3] Extend `quality/checks.py`: status domain, non-negative hours, OT multiples of 0.5, one row per employee-day â†’ **Gate A**
+- [x] T025 [US3] `transform/07_attendance_daily.py` **part A â€” day spine**: employee Ã— day rows from hireâ†’min(sep, 2026-09-30), clamped to window (Rule 4)
+- [x] T026 [US3] **part B — session attribution**: `shift_date` = session first-punch date (new session on shift check-IN window [start−2h, start+3h), gap > 12.5h, span > 16h; lone pre-noon NIGHT check-out steps back a day) (Rule 7); pair first-in/last-out per `(emp_id, shift_date)`; single punch → flag (Rule 10) (FR-019)
+- [x] T027 [US3] **part C â€” status CASE chain** in exact Rule-12 priority: Weekly Off â†’ Holiday â†’ On Leave â†’ Present â†’ Missing Punch â†’ Absent (FR-020)
+- [x] T028 [US3] **part D â€” measures**: worked hours, late minutes (>10 after start), early-departure (>10 before end) only on Present; OT half-hour flooring; Sunday/holiday work = all OT (Rules 13, 14, 15) (FR-021/022/023)
+- [x] T029 [US3] Extend `quality/checks.py`: status domain, non-negative hours, OT multiples of 0.5, one row per employee-day â†’ **Gate A**
 
 ---
 

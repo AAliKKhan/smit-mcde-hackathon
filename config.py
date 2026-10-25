@@ -99,12 +99,17 @@ PLANT_CODE = {
     "Faisalabad Plant": "FSD",
 }
 
-# Night shift starts 22:00; a punch before 06:00 belongs to the previous day.
+# Night shift starts 22:00; attribution is session-based (ADR-002 step 2), not a
+# fixed clock offset - a session dated by its first punch covers the crossing.
 # Used for shift-date attribution (Rule 7, research R5).
 NIGHT_SHIFT = {"code": "NIGHT", "start": "22:00", "end": "06:00", "crosses_midnight": True}
 
 # ---------------------------------------------------------------- runtime knobs
 MIN_GAP_MINUTES = 2          # Rule 9: two punches within 2 minutes count as one
+SESSION_GAP_HOURS = 12.5     # Rule 7: max gap inside one shift session
+                             # (within-shift max observed 12.21h = GEN 08:46-20:58
+                             #  OT day; between-shift breaks are >= 11.68h but are
+                             #  caught by the MAX_SHIFT_HOURS session-span cap)
 GRACE_MINUTES = 10           # Rule 13: lateness / early-departure threshold
 OT_ROUND_MINUTES = 30        # Rule 14/15: floor to whole half-hours
 MAX_SHIFT_HOURS = 16         # sanity check (FR-024 / FR-050)
