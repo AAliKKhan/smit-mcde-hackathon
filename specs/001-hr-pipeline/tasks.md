@@ -137,9 +137,9 @@ Rule citations from `data/data_dictionary.md` are embedded in task text â€”
 **Goal**: `dq_results` complete & automated post-load (FR-045â€¦050)
 **Independent Test**: clean run all PASS; seeded violation flips FAIL
 
-- [ ] T049 [US6] `quality/checks.py` families: PK uniqueness/not-null (all tables), RI factâ†’dim, reconciliation `raw = staging + rejected`, accepted values (attendance status, leave type, pay component), sanity (negative hours, >16h shifts, SCD2 overlap)
-- [ ] T050 [US6] `quality/run_dq.py` entry point + wire into `run_pipeline.py` after every stage load
-- [ ] T051 [US6] `tests/test_dq.py`: seed an invalid status row â†’ expect FAIL â†’ cleanup â†’ PASS (SC-007) â†’ **Gate D**
+- [x] T049 [US6] `quality/checks.py` families: PK uniqueness/not-null (all tables), RI factâ†’dim, reconciliation `raw = staging + rejected`, accepted values (attendance status, leave type, pay component), sanity (negative hours, >16h shifts, SCD2 overlap)
+- [x] T050 [US6] `quality/run_dq.py` entry point + wire into `run_pipeline.py` after every stage load
+- [x] T051 [US6] `tests/test_dq.py`: seed an invalid status row â†’ expect FAIL â†’ cleanup â†’ PASS (SC-007) â†’ **Gate D**
 
 ---
 
