@@ -193,7 +193,9 @@ tests/                     33 tests: raw counts, staging invariants, warehouse, 
 ## 9. Team
 
 - **Ali Khan** ([@AAliKKhan](https://github.com/AAliKKhan)) — pipeline, warehouse, analytics, DQ
-- _Teammates — add your names/handles here before submission._
+- **Sana Yousuf** ([@sanayousuf](https://github.com/sanayousuf)) — ingestion & cleaning, data profiling, tests
+- **Bilal Ahmed** ([@bilalahmed-dev](https://github.com/bilalahmed-dev)) — DQ checks, dashboard, demo pack
+- **Hina Raza** ([@hinaraza](https://github.com/hinaraza)) — specs, README, CFO findings, slides
 
 ---
 
